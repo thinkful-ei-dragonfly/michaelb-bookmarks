@@ -7,26 +7,12 @@ const bookmarkRouter = express.Router()
 const bodyParser = express.json()
 
 bookmarkRouter
-  .get('/bookmarks', (req, res) => {
+  .route('/bookmarks')
+  .get((req, res) => {
     res
       .json(bookmarks);
   })
-
-bookmarkRouter
-  .get('/bookmarks/:id', (req, res) => {
-    const { id } = req.params;
-    const bookmark = bookmarks.find(bookmark => bookmark.id == id);
-    if (!bookmark) {
-      logger.error(`Bookmark with id ${id} not found.`);
-      return res
-        .status(404)
-        .send('Bookmark Not Found');
-    }
-    res.json(bookmark);
-  })
-
-bookmarkRouter
-  .post('/bookmarks', (req, res) => {
+  .post(bodyParser, (req, res) => {
     const { title, url, desc, rating } = req.body;
 
     if (!title) {
@@ -72,12 +58,24 @@ bookmarkRouter
 
     res
       .status(201)
-      .location(`http://localhost:8000/bookmark/${id}`)
+      .location(`https://michaelb-bookmarks-server.herokuapp.com/${id}`)
       .json({id});
   });
 
 bookmarkRouter
-  .delete('/bookmarks/:id', (req, res) => {
+  .route('/bookmarks/:id')
+  .get(bodyParser, (req, res) => {
+    const { id } = req.params;
+    const bookmark = bookmarks.find(bookmark => bookmark.id == id);
+    if (!bookmark) {
+      logger.error(`Bookmark with id ${id} not found.`);
+      return res
+        .status(404)
+        .send('Bookmark Not Found');
+    }
+    res.json(bookmark);
+  })
+  .delete(bodyParser, (req, res) => {
     const { id } = req.params;
 
     const bookmarkIndex = bookmarks.findIndex(bookmark => bookmark.id == id);
